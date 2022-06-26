@@ -185,7 +185,7 @@ nav b {
   font-weight: 500;
   
   -webkit-app-region: no-drag;
-
+  height: env(titlebar-area-height, 2.5rem);
 }
 
 .navflex div a {
