@@ -91,6 +91,7 @@ nav {
   top: env(titlebar-area-y, 0);
   width: env(titlebar-area-width, 100%);
   height: env(titlebar-area-height, 33px);
+  app-region: drag;
 }
 
 .blur,
