@@ -500,8 +500,6 @@
                 let response = this.responseText;
                 let responseHTML = document.createElement('html');
                 responseHTML.innerHTML = response;
-                if (response == "See /corsdemo for more info")
-                    alert("https://cors-anywhere.herokuapp.com/corsdemo");
 
                 let outputHTML = document.querySelector("#teplateLinkData").content.cloneNode(true);
                 metasToGet.forEach(item => {
@@ -533,7 +531,7 @@
                 outputdiv.appendChild(outputHTML);
             }
             xhttp.timeout = 2000;
-            xhttp.open("GET", "https://cors-anywhere.herokuapp.com/" + url, true);
+            xhttp.open("GET", url, true);
             xhttp.send();
         }
 
