@@ -86,7 +86,6 @@ nav {
   position: sticky;
   top: 0;
   
-  position: fixed;
   left: env(titlebar-area-x, 0);
   top: env(titlebar-area-y, 0);
   width: env(titlebar-area-width, 100%);
