@@ -1,9 +1,9 @@
 {
-    "name": "Dev'Coffee",
-    "short_name": "DevCoffee",
-    "start_url": "desktop.html",
+    "name": "MDesk",
+    "short_name": "MDesk",
+    "start_url": "index.html",
     "display": "standalone",
-    "background_color": "#fdfdfd",
+    "background_color": "#fff",
     "theme_color": "#db4938",
     "orientation": "portrait-primary",
     "icons": [
