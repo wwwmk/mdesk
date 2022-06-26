@@ -116,9 +116,9 @@ nav {
   justify-content: space-between;
   align-items: center;
   align-content: center;
-  padding: calc(var(--padding) * 0) var(--padding);
+  padding: calc(var(--padding) / 2) var(--padding);
   gap: var(--padding);
-  min-height: 4rem
+  min-height: 4rem;
 }
 
 input[type="text"],
@@ -184,10 +184,6 @@ nav b {
   font-weight: 500;
   
   -webkit-app-region: no-drag;
-}
-
-.navflex div a {
-  height: auto;
 }
 
 footer p {
