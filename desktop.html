@@ -1,0 +1,712 @@
+<html>
+
+<head>
+    <title>Desktop</title>
+    <script src="menu.js" async></script>
+    <link rel="stylesheet" href="s.css">
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#db4938" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        #dropzone {
+            text-align: center;
+            user-select: none;
+            display: none;
+            background: rgb(0 0 0 / 50%);
+            height: 100vh;
+            width: 100vw;
+            top: 0;
+            font-size: 1.25rem;
+            position: fixed;
+            color: #fff;
+            font-weight: 600;
+            backdrop-filter: blur(0.125rem);
+            z-index: 9999;
+        }
+
+        .draggingover#dropzone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .cancelDrag {
+            padding: 0 1rem;
+            line-height: 2.5rem;
+            height: 2.5rem;
+            background-color: rgb(0 0 0 / 10%);
+            border: none;
+            font: inherit;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        #droppedlist:empty::before {
+            background-image: url("https://d30y9cdsu7xlg0.cloudfront.net/png/49665-200.png");
+            height: 8rem;
+            width: 8rem;
+            display: block;
+            background-size: contain;
+            content: "";
+            margin: auto;
+            margin-top: 4rem;
+            opacity: 0.5;
+        }
+
+        #droppedlist:empty::after {
+            content: "You have yet to add anything. Drag and drop links, text, youtube links, videos";
+            text-align: center;
+            display: block;
+            margin: auto;
+        }
+
+        #droppedlist li {
+            margin-bottom: 1rem;
+            /* width: max-content; */
+            max-width: 100%;
+            animation: 0.1s listitem ease;
+        }
+
+        @keyframes listitem {
+            0% {
+                transform: scale(0.5);
+                opacity: 0.5;
+            }
+        }
+
+        #droppedlist video,
+        #droppedlist img,
+        #droppedlist iframe {
+            width: 100%;
+            display: block;
+            aspect-ratio: 16/9;
+            object-fit: contain;
+            background-color: #aaa;
+            border-radius: var(--border-radius);
+            user-select: none;
+        }
+
+        .listItemTopBar {
+            display: flex;
+            gap: 1rem;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .itembaractions a {
+            display: block;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        .openlinkbtn[href=""] {
+            display: none;
+        }
+
+        #droppedlist time {
+            display: block;
+            font-weight: bold;
+            color: #666;
+            flex: 1
+        }
+
+        .linkInfos {
+            display: flex;
+            flex-direction: row;
+            gap: 1rem;
+            align-items: stretch;
+        }
+
+        .linkInfos>div {
+            flex: 1;
+        }
+
+        .sitename {
+            font-weight: bold;
+            color: #666;
+            display: block;
+        }
+
+        .sitetitle {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: var(--padding);
+        }
+
+        .sitedesc {
+            display: block;
+            max-width: 100%;
+            line-height: 1.5rem;
+            max-height: 6rem;
+            overflow: hidden;
+        }
+
+        #droppedlist img.siteimg {
+            object-fit: cover;
+            width: 25%;
+            min-height: 8rem;
+        }
+
+        .siteimg[src="none"] {
+            display: none;
+        }
+
+        [menu]:not(.hidden-top) {
+            transform: translateY(-1rem);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        [menu] {
+            transition: var(--transition) transform, var(--transition) opacity;
+            z-index: 99909;
+            position: fixed;
+            top: -100vh;
+            overflow-y: auto;
+            min-width: 20rem !important;
+            width: max-content;
+            box-shadow: var(--shadow-l);
+            border-radius: var(--border-radius);
+        }
+
+        .menulinks {
+            text-decoration: none;
+            font-weight: 500;
+            padding: calc(var(--padding) / 2) var(--padding);
+            height: auto;
+            line-height: 1.5rem;
+        }
+
+        a.menulinks,
+        span.menulinks {
+            display: block;
+        }
+
+        label.menulinks {
+            display: flex;
+            align-items: center;
+        }
+
+        label.menulinks span {
+            flex: 1;
+        }
+
+        .menulinks:hover {
+            background: var(--light);
+        }
+
+        .menulinks .bx {
+            margin-right: 1rem;
+        }
+
+        .alert {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            cursor: pointer;
+            max-width: 15rem;
+            background: var(--white);
+            color: var(--accent);
+            border: var(--border);
+            padding: calc(var(--padding) / 2) var(--padding);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-m);
+            font-weight: 500;
+            animation: alert var(--transition) ease;
+        }
+
+        @keyframes alert {
+            0% {
+                opacity: 0;
+            }
+        }
+
+        a[menutoopen="people-menu"] div {
+            border-radius: 50%;
+            height: 1.5rem;
+            width: 1.5rem;
+            text-align: center;
+            line-height: 1.5rem;
+            background-color: var(--dark);
+            color: #fff;
+            font-weight: bold;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+
+        [menutoopen] {
+            user-select: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="fff">
+    <nav class="blur">
+        <div class="max2 navinnner">
+            <a href="" style="margin-right: auto">MDesk</a>
+            <a menutoopen="sync-menu" class="light round border"
+                style="height: 2rem; line-height: 2rem; padding: 0 0.5rem">
+                <i class='bx bx-sync bx-sm'></i>Sync Off
+            </a>
+            <a menutoopen="optionsmenu">
+                <i class='bx bx-dots-vertical-rounded bx-sm'></i>
+            </a>
+        </div>
+    </nav>
+
+    <div menu="sync-menu" class="one flex down gap flex-stretch">
+        <span class="b">Sync</span>
+        Login in to save your Desktops online.
+        <a href="" class="menulinks center accent">Register</a>
+        <a href="" class="menulinks center">Login</a>
+    </div>
+
+    <div menu="optionsmenu">
+        <a href="" class="menulinks"><i class='bx bx-select-multiple bx-sm'></i>Select</a>
+        <a class="menulinks" href="" onclick="resetlist();">
+            <i class='bx bx-reset bx-sm'></i>Reset
+        </a>
+        <a class="menulinks" onclick="exportList()">
+            <i class='bx bx-export bx-sm'></i>Export
+        </a>
+        <a class="menulinks" onclick="importList()">
+            <i class='bx bx-import bx-sm'></i>Import
+        </a>
+        <a class="menulinks" href="">
+            <i class='bx bx-help-circle bx-sm'></i>Help
+        </a>
+        <a class="menulinks" href="">
+            <i class='bx bx-face bx-sm'></i>Account
+        </a>
+        <label class="menulinks">
+            <i class='bx bx-moon bx-sm'></i>
+            <span style="flex: 1">Dark mode</span>
+            <input type="checkbox" class="toggle">
+        </label>
+    </div>
+
+    <div class="one max2">
+        <div class="flex gap">
+            <a menutoopen="selectdesktopmenu" class="b">
+                Desktop1<i class='bx bx-chevron-down bx-xs'></i>
+            </a>
+            <a menutoopen="sort-menu" class="b">
+                View<i class='bx bx-chevron-down bx-xs'></i>
+            </a>
+            <a menutoopen="people-menu" style="margin-left: auto">
+                <div>M</div>
+                <div>J</div>
+                <div>K</div>
+                <div class="light">+2</div>
+            </a>
+            <div menu="people-menu" class="light one gap flex down flex-stretch">
+                <div class="flex">
+                    <span style="flex: 1" class="b">Sharing</span>
+                    <a href="" style="color: var(--accent); text-decoration: none;">Edit</a>
+                </div>
+                <div class="fff corners">
+                    <span class="menulinks" style="color: var(--accent)">Matti (You)</span>
+                    <span class="menulinks">MattiK</span>
+                </div>
+                <span class="b">Add people</span>
+                <input type="text" name="" id="" placeholder="Email address">
+            </div>
+            <div menu="selectdesktopmenu" class="light one gap flex down flex-stretch">
+                <div class="flex">
+                    <span style="flex: 1" class="b">Select desktop</span>
+                    <a href="" style="color: var(--accent); text-decoration: none;">Edit</a>
+                </div>
+                <div class="fff corners">
+                    <label class="menulinks">
+                        <span>Desktop1</span>
+                        <input type="radio" name="desktopradio" checked>
+                    </label>
+                    <label class="menulinks">
+                        <span>Kitchen remodel</span>
+                        <input type="radio" name="desktopradio">
+                    </label>
+                    <label class="menulinks">
+                        <span>Get Started</span>
+                        <input type="radio" name="desktopradio">
+                    </label>
+                </div>
+                <a class="menulinks fff corners" style="color: var(--accent);"><i class='bx bx-plus bx-sm'></i>New
+                    Desktop</a>
+            </div>
+            <div menu="sort-menu" class="light one gap flex down flex-stretch">
+                <span class="b">Sort by</span>
+                <div class="fff corners">
+                    <label class="menulinks">
+                        <span>Oldest</span>
+                        <input type="radio" name="sortradio" checked>
+                    </label>
+                    <label class="menulinks">
+                        <span>Newest</span>
+                        <input type="radio" name="sortradio">
+                    </label>
+                </div>
+                <span class="b">Filter</span>
+                <div class="fff corners">
+                    <label class="menulinks">
+                        <span>Photos</span>
+                        <input type="checkbox">
+                    </label>
+                    <label class="menulinks">
+                        <span>Videos</span>
+                        <input type="checkbox">
+                    </label>
+                    <label class="menulinks">
+                        <span>Embed</span>
+                        <input type="checkbox">
+                    </label>
+                    <label class="menulinks">
+                        <span>Text</span>
+                        <input type="checkbox">
+                    </label>
+                    <label class="menulinks">
+                        <span>Links</span>
+                        <input type="checkbox">
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="light m-top corners border"
+            style="width: 100%; display: flex; align-items: center; flex: 1; height: 3rem">
+            <input type="text" id="add-new-input" placeholder="Paste link/text"
+                style="background: inherit; flex: 1; outline: none; border: none;">
+            <a style="padding: 0 1rem" class="b"
+                onclick="if(document.querySelector('#add-new-input').value) {addNewItemToList(document.querySelector('#add-new-input').value); document.querySelector('#add-new-input').value = '' }">
+                Add
+            </a>
+        </div>
+    </div>
+
+
+    <div id="dropzone">
+        Drop the file/link/text here
+        <button onclick="dragleaved()" class="cancelDrag">Cancel</button>
+    </div>
+    <ul id="droppedlist" class="max2 one"></ul>
+
+    <template id="templateListItem">
+        <li class="light one gap flex down corners flex-stretch">
+            <div class="listItemTopBar">
+                <i class='bx bx-sm filetype'></i>
+                <time></time>
+                <a menutoopen="">
+                    <i class='bx bx-dots-vertical-rounded bx-sm'></i>
+                </a>
+            </div>
+            <div class="itemRichInfo"></div>
+            <div menu="" class="flex down flex-stretch">
+                <a class="menulinks">
+                    <i class='bx bx-edit bx-sm'></i>Edit
+                </a>
+                <a class="menulinks" title="Archive">
+                    <i class='bx bx-archive-in bx-sm'></i>Archive
+                </a>
+                <a class="menulinks sharebtn" title="Share">
+                    <i class='bx bx-share bx-sm'></i>Share
+                </a>
+                <a class="menulinks copybtn" title="Copy to clipboard">
+                    <i class='bx bx-copy bx-sm'></i>Copy
+                </a>
+                <a class="menulinks cutbtn" title="Cut">
+                    <i class='bx bx-cut bx-sm'></i>Cut
+                </a>
+                <a class="menulinks expandbtn" title="Fullscreen">
+                    <i class='bx bx-expand-alt bx-sm'></i>Expand
+                </a>
+                <a class="menulinks openlinkbtn" title="Open link in a new tab" target="_blank">
+                    <i class='bx bx-link-external bx-sm'></i>Open
+                </a>
+                <a class="menulinks hidebtn" style="color: red;" title="Delete">
+                    <i class='bx bx-trash bx-sm'></i>Delete
+                </a>
+            </div>
+        </li>
+    </template>
+    <template id="teplateLinkData">
+        <div class="linkInfos">
+            <img class="siteimg" src="" alt="">
+            <div>
+                <span class="sitename"></span>
+                <span class="sitetitle"></span>
+                <span class="sitedesc"></span>
+                <a href="#" class="siteurl"></a>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        function alertPopUp(text) {
+            var alertDiv = document.createElement("div");
+            alertDiv.innerText = text;
+            alertDiv.classList.add("nothidden", "alert");
+            alertDiv.addEventListener("click", function () {
+                this.remove();
+            });
+            document.body.appendChild(alertDiv);
+        }
+
+        var listofitemsinitemlist = [];
+
+        const metasToGet = [
+            /* {
+                 name: "meta[name='description']",
+                 outputSelector: ".sitedesc"
+             },
+             {
+                 name: "meta[property='og:description']",
+                 outputSelector: ".sitedesc"
+             },
+            {
+                name: "meta[property='og:site_name']",
+                outputSelector: ".sitename"
+            }*/
+        ]
+
+        const imageEnds = [
+            ".jpg",
+            ".png",
+            ".jpeg",
+            ".gif",
+        ]
+        function getUrlMetas(url, outputdiv) {
+
+            const xhttp = new XMLHttpRequest();
+
+            xhttp.onerror = function () {
+                let outputHTML = document.createElement("a");
+                outputHTML.href = url;
+                outputHTML.innerText = url;
+                outputdiv.appendChild(outputHTML);
+                console.log("Error loading info on " + url);
+            }
+            xhttp.ontimeout = function () {
+                let outputHTML = document.createElement("a");
+                outputHTML.href = url;
+                outputHTML.innerText = url;
+                outputdiv.appendChild(outputHTML);
+                console.log("Timed out " + url);
+            }
+            xhttp.onload = function () {
+                let response = this.responseText;
+                let responseHTML = document.createElement('html');
+                responseHTML.innerHTML = response;
+                if (response == "See /corsdemo for more info")
+                    alert("https://cors-anywhere.herokuapp.com/corsdemo");
+
+                let outputHTML = document.querySelector("#teplateLinkData").content.cloneNode(true);
+                metasToGet.forEach(item => {
+                    try {
+                        outputHTML.querySelector(item.outputSelector).innerText = responseHTML.querySelector(item.name).content;
+                    }
+                    catch (err) {
+                        console.log(err);
+                    }
+                });
+
+                try {
+                    if (responseHTML.querySelector("meta[property='og:image']"))
+                        outputHTML.querySelector(".siteimg").src = responseHTML.querySelector("meta[property='og:image']").content;
+                    else
+                        outputHTML.querySelector(".siteimg").remove();
+                }
+                catch (err) {
+                    console.log(err);
+                }
+                try {
+                    outputHTML.querySelector(".sitetitle").innerText = responseHTML.querySelector("title").innerText;
+                }
+                catch (err) {
+                    console.log(err);
+                }
+                outputHTML.querySelector(".siteurl").innerText = url;
+                outputHTML.querySelector(".siteurl").href = url;
+                outputdiv.appendChild(outputHTML);
+            }
+            xhttp.timeout = 2000;
+            xhttp.open("GET", "https://cors-anywhere.herokuapp.com/" + url, true);
+            xhttp.send();
+        }
+
+        function addNewItemToList(datatext, timeDate) {
+            if (timeDate) {
+                timeDate = new Date(timeDate);
+            }
+            else {
+                timeDate = new Date();
+            }
+            time = timeDate.toLocaleTimeString("fi-FI", {
+                hour: "2-digit",
+                minute: "2-digit",
+            });
+            day = timeDate.toLocaleDateString("fi-FI");
+
+            let newlistitem = document.querySelector("#templateListItem").content.cloneNode(true);
+            newlistitem.querySelector("time").innerText = time + " - " + day;
+            let removebtn = newlistitem.querySelector(".hidebtn");
+            removebtn.addEventListener("click", function () {
+                removefromthelist(datatext);
+            });
+            let copybtn = newlistitem.querySelector(".copybtn");
+            copybtn.addEventListener("click", function () {
+                navigator.clipboard.writeText(datatext)
+                    .then(() => {
+                        closeAllMenus();
+                        alertPopUp('Text copied to clipboard');
+                    })
+
+            });
+            let cutbtn = newlistitem.querySelector(".cutbtn");
+            cutbtn.addEventListener("click", function () {
+                navigator.clipboard.writeText(datatext)
+                    .then(() => {
+                        closeAllMenus();
+                        alertPopUp('Text copied to clipboard');
+                        removefromthelist(datatext);
+                    });
+            });
+            let sharebtn = newlistitem.querySelector(".sharebtn");
+            sharebtn.addEventListener("click", function () {
+                navigator
+                    .share({
+                        title: document.title,
+                        text: 'Hello World',
+                        url: window.location.href
+                    })
+                    .then(() => console.log('Successful share! 🎉'))
+                    .catch(err => console.error(err));
+            });
+            var richInfo = "";
+            if (datatext.startsWith("https://")) {
+                if (datatext.includes(".mp4")) {
+                    richInfo = "<video autoplay controls src=" + datatext + "></video>";
+                    newlistitem.querySelector(".filetype").classList.add("bx-video");
+                }
+                imageEnds.forEach(item => {
+                    if (datatext.includes(item)) {
+                        richInfo = "<img src=" + datatext + ">";
+                        newlistitem.querySelector(".filetype").classList.add("bx-image-alt");
+                    }
+                })
+                if (datatext.includes("youtu.be/")) {
+                    let ytUrlCode = datatext.split("youtu.be/")[1];
+                    richInfo = '<iframe width="" height="" src="https://www.youtube.com/embed/' + ytUrlCode + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'
+                    newlistitem.querySelector(".filetype").classList.add("bx-expand-horizontal");
+                }
+                if (datatext.includes("youtube.com/watch?")) {
+                    let ytUrlCode = datatext.split("v=")[1];
+                    ytUrlCode = ytUrlCode.split("&")[0];
+                    richInfo = '<iframe width="" height="" src="https://www.youtube.com/embed/' + ytUrlCode + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'
+                    newlistitem.querySelector(".filetype").classList.add("bx-expand-horizontal");
+                }
+                if (!richInfo) {
+                    getUrlMetas(datatext, newlistitem.querySelector(".itemRichInfo"));
+                    newlistitem.querySelector(".filetype").classList.add("bx-link");
+                }
+                newlistitem.querySelector(".openlinkbtn").href = datatext;
+            }
+            else {
+                richInfo = datatext;
+                newlistitem.querySelector(".filetype").classList.add("bx-text");
+                newlistitem.querySelector(".openlinkbtn").remove();
+            }
+            newlistitem.querySelector(".expandbtn").addEventListener("click", function () {
+                newlistitem.querySelector("li").classList.add("popout");
+            })
+            newlistitem.querySelector(".itemRichInfo").innerHTML = richInfo;
+
+            var listitemidex = listofitemsinitemlist.length;
+            newlistitem.querySelector("a[menutoopen]").setAttribute("menutoopen", "itemoptionsmenu" + listitemidex)
+            newlistitem.querySelector("[menu]").setAttribute("menu", "itemoptionsmenu" + listitemidex);
+
+            document.querySelector("#droppedlist").prepend(newlistitem);
+            var newitemlistitemjsonstyle = {
+                "data": datatext,
+                "timeDate": timeDate
+            }
+            listofitemsinitemlist.push(newitemlistitemjsonstyle);
+            savelist();
+        }
+
+        function removefromthelist(i) {
+            alert(i)
+        }
+
+        function savelist() {
+            localStorage.setItem("itemlist", JSON.stringify(listofitemsinitemlist));
+        }
+
+        function loadlist() {
+            let storagelistget = localStorage.getItem("itemlist");
+
+            if (storagelistget) {
+                JSON.parse(storagelistget).forEach(item => {
+                    addNewItemToList(item.data, item.timeDate);
+                });
+            }
+        }
+
+        function exportList() {
+            let storagelistget = localStorage.getItem("itemlist");
+
+            if (JSON.parse(storagelistget).length > 0) {
+                console.log(storagelistget);
+                alertPopUp("List exported to console");
+            }
+            else {
+                alertPopUp("Nothing to export - Your list is empty")
+            }
+        }
+
+        function importList() {
+            let storagelistget = JSON.parse(prompt("Enter list JSON"));
+            if (storagelistget.length > 0) {
+                storagelistget.forEach(item => {
+                    addNewItemToList(item.data, item.timeDate);
+                });
+            }
+        }
+
+        function resetlist() {
+            listofitemsinitemlist = [];
+            savelist();
+        }
+
+        loadlist();
+
+        function dropped(ev) {
+            ev.preventDefault();
+            console.log(ev.dataTransfer.types);
+            console.log(ev.dataTransfer.getData("text/uri-list"));
+
+            var datatext = ev.dataTransfer.getData("text");
+            addNewItemToList(datatext);
+            document.querySelector("#dropzone").classList.remove("draggingover");
+            document.querySelector("#dropzone").scrollIntoView();
+        }
+
+        function draggedover(ev) {
+            document.querySelector("#dropzone").classList.add("draggingover");
+            ev.preventDefault();
+        }
+
+        function dragleaved(ev) {
+            document.querySelector("#dropzone").classList.remove("draggingover");
+        }
+
+        document.querySelector("#dropzone").addEventListener("drop", dropped);
+        document.body.addEventListener("dragover", draggedover);
+        //document.body.addEventListener("dragleave", dragleaved);
+    </script>
+</body>
+
+</html>
