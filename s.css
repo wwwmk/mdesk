@@ -89,7 +89,6 @@ nav {
   left: env(titlebar-area-x, 0);
   top: env(titlebar-area-y, 0);
   width: env(titlebar-area-width, 100%);
-  height: env(titlebar-area-height, auto);
   -webkit-app-region: drag;
 }
 
@@ -119,7 +118,6 @@ nav {
   align-content: center;
   padding: calc(var(--padding) * 0) var(--padding);
   gap: var(--padding);
-  min-height: env(titlebar-area-height, 4rem);
 }
 
 input[type="text"],
@@ -185,7 +183,6 @@ nav b {
   font-weight: 500;
   
   -webkit-app-region: no-drag;
-  height: env(titlebar-area-height, 2.5rem);
 }
 
 .navflex div a {
