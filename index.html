@@ -287,7 +287,7 @@
         <label class="menulinks">
             <i class='bx bx-moon bx-sm'></i>
             <span style="flex: 1">Dark mode</span>
-            <input type="checkbox" class="toggle">
+            <input type="checkbox" onchange="if(this.checked) document.body.classList.add('night'); else document.body.classList.remove('night');" class="toggle">
         </label>
     </div>
 
