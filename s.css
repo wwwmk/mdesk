@@ -119,7 +119,7 @@ nav {
   align-content: center;
   padding: calc(var(--padding) * 0) var(--padding);
   gap: var(--padding);
-  min-height: 4rem;
+  min-height: env(titlebar-area-height, 4rem);
 }
 
 input[type="text"],
