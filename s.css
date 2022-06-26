@@ -90,7 +90,7 @@ nav {
   top: env(titlebar-area-y, 0);
   width: env(titlebar-area-width, 100%);
   height: env(titlebar-area-height, auto);
-  app-region: drag;
+  -webkit-app-region: drag;
 }
 
 .blur,
@@ -183,6 +183,9 @@ nav b {
   cursor: pointer;
   border-radius: 0;
   font-weight: 500;
+  
+  -webkit-app-region: no-drag;
+
 }
 
 .navflex div a {
