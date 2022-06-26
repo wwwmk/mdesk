@@ -117,7 +117,7 @@ nav {
   justify-content: space-between;
   align-items: center;
   align-content: center;
-  padding: calc(var(--padding) / 2) var(--padding);
+  padding: calc(var(--padding) * 0) var(--padding);
   gap: var(--padding);
   min-height: 4rem;
 }
